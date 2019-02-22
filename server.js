@@ -168,14 +168,12 @@ app.delete("/bathrooms/:id", function (req, res) {
 
 
 /* Slack stuff */
+// Bot responses
 app.post("/slack", function (req, res) {
   var request = req.body;
-  var challenge = request.challenge;
   var text = request.event.text;
   var type = request.event.type;
   var channelName = request.event.channel;
-  var channelType = request.event.channel_type;
-  var apiAppId = request.api_app_id;
   var message = "";
   if ("app_mention" === type && text.toLowerCase().indexOf("status") !== -1) {
     var promise1 = new Promise(function (resolve, reject) {
@@ -199,10 +197,10 @@ app.post("/slack", function (req, res) {
   }
   res.status(200).send();
 });
+
+// Slash command
 app.post("/slash", function (req, res) {
   var request = req.body;
-  var command = req.command;
-  var text = request.text;
   // respond within 3000ms with status 200 that the request was received
   // in order to respond with pretty text we send a response_url
   var attachments = []
@@ -232,16 +230,10 @@ app.post("/slash", function (req, res) {
     var body =
     {
       "response_type": "ephemeral", // they call responses only visible to original users ephemeral
-      "text": "You have pinged bathroom bot!",
+      "text": ":poop:Here's the inside poop: :poop:",
       "attachments": attachments
     }
-
-    // var url = request.response_url;
-    // var xmlHttp = new XMLHttpRequest();
-    // xmlHttp.open("POST", url, true); // false for synchronous request
-    // xmlHttp.setRequestHeader("Content-Type", "application/json");
-    // xmlHttp.send(body);
     res.status(200).send(body);
   });
-  
+
 });
