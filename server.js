@@ -199,7 +199,7 @@ app.post("/slack", function (req, res) {
   }
   res.status(200).send();
 });
-app.post("/command", function (req, res) {
+app.post("/slash", function (req, res) {
   var request = req.body;
   console.log(req);
   var command = req.command;
