@@ -13,14 +13,14 @@ var BATHROOMS = [
   {
     "5c5dcc98aa6c3e001790f844":
     {
-      name: "Bathroom%201",
+      name: "LEFT",
       lastUpdated: null,
     }
   },
   {
     "5c5dea87b3ab79e53642272f":
     {
-      name: "Bathroom%202",
+      name: "RIGHT",
       lastUpdated: null,
     }
   }
@@ -123,23 +123,12 @@ function updateSlackChannel(id, state) {
   if (lastTimestamp) {
     url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GG2E2ETNZ&ts=' + lastTimestamp
     fetch(url, { method: 'POST' })
-      .then(response => response.json())
-      .then(data => {
-        timestamp = data['ts'];
-        BATHROOMS[index] = {
-          [id]: {
-            name: roomName,
-            lastUpdated: timestamp
-          }
-        }
-      })
       .catch(error => console.error(error));
   }
 
-
   // Post new message
   stateText = state ? "vacant" : "occupied";
-  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=bathroom_bot&text=' + roomName + '%20is%20' + stateText
+  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=bathroom_bot&text=the%20' + roomName + '%20bathroom%20is%20' + stateText
 
   fetch(postUrl)
     .then(response => response.json())
@@ -182,9 +171,9 @@ app.post("/slack", function (req, res) {
       db.collection(BATHROOMS_COLLECTION).find().toArray(function (err, result) {
         result.forEach(function (bathroom) {
           if (bathroom.vacant) {
-            message += ":awyeah: :partyparrot: " + bathroom.name + " is vacant! :partyparrot: :awyeah:\n";
+            message += ":awyeah: :partyparrot: The " + bathroom.name + " bathroom is vacant! :partyparrot: :awyeah:\n";
           } else {
-            message += ":awkwardseal: :nicmoji_sad: Uh oh, " + bathroom.name + " is occupied :nicmoji_sad: :awkwardseal:\n";
+            message += ":awkwardseal: :nicmoji_sad: Uh oh, the " + bathroom.name + " bathroom is occupied :nicmoji_sad: :awkwardseal:\n";
           }
         });
         resolve(message);
@@ -213,14 +202,14 @@ app.post("/slash", function (req, res) {
           attachments.push(
             {
               "color": "good",
-              "text": `:awyeah: :partyparrot: ${bathroom.name} is vacant! :partyparrot: :awyeah:\n`
+              "text": `:awyeah: :partyparrot: The ${bathroom.name} bathroom is vacant! :partyparrot: :awyeah:\n`
             }
           )
         } else {
           attachments.push(
             {
               "color": "danger",
-              "text": `:awkwardseal: :nicmoji_sad: Uh oh, ${bathroom.name} is occupied :nicmoji_sad: :awkwardseal:\n`
+              "text": `:awkwardseal: :nicmoji_sad: Uh oh, the ${bathroom.name} bathroom is occupied :nicmoji_sad: :awkwardseal:\n`
             }
           )
         }
@@ -243,5 +232,5 @@ app.post("/slash", function (req, res) {
     xmlHttp.send(body);
     res.status(200).send(body);
   });
-  
+
 });
