@@ -219,7 +219,7 @@ app.post("/slash", function (req, res) {
     var body =
     {
       "response_type": "ephemeral", // they call responses only visible to original users ephemeral
-      "text": ":poop:Here's the inside poop: :poop:",
+      "text": ":poop:Here's the inside poop:poop:",
       "attachments": attachments
     }
     res.status(200).send(body);
