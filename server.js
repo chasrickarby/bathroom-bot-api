@@ -112,6 +112,53 @@ app.post("/slack", function(req, res) {
   res.status(200).send();
 });
 
+app.post("/slash", function(req, res) {
+  var request = req.body;
+  var command = req.command;
+  var text = request.text;
+
+  // respond within 3000ms with status 200 that the request was received
+  // in order to respond with pretty text we send a response_url
+
+  response =
+  {
+    "response_type": "ephemeral", // they call responses only visible to original users ephemeral
+    "text": "You have pinged bathroom bot",
+     "response_url": "/slash-response"
+  }
+  res.status(200).json(response);
+
+});
+
+app.get("slash-response", function(req, res) {
+  attachments = []
+
+  db.collection(BATHROOMS_COLLECTION).find().toArray(function(err, result) {
+  result.forEach(function(bathroom){
+    if(bathroom.vacant){
+      attachments.push(
+        [
+          "color": "good",
+          "text": `:awyeah: :partyparrot: #{bathroom.name} is vacant! :partyparrot: :awyeah:\n`
+        ]
+      )
+    } else {
+      attachments.push([
+        "color": "danger",
+        "text": `:awkwardseal: :nicmoji_sad: Uh oh, #{bathroom.name} is occupied :nicmoji_sad: :awkwardseal:\n`
+      ])
+    }
+
+  response =
+  {
+    "response_type": "ephemeral", // they call responses only visible to original users ephemeral
+    "text": "You have pinged bathroom bot!",
+     "attachments": attachments
+  }
+  res.status(200).json(response);
+
+});
+
 app.get("/bathrooms/:id", function(req, res) {
   db.collection(BATHROOMS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
     if (err) {
