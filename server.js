@@ -128,7 +128,7 @@ function updateSlackChannel(id, state) {
 
   // Post new message
   stateText = state ? "vacant" : "occupied";
-  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=bathroom-bot&text=The%20' + roomName + '%20bathroom%20is%20' + stateText
+  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=GGEEVQ5H9&text=The%20' + roomName + '%20bathroom%20is%20' + stateText
 
   fetch(postUrl)
     .then(response => response.json())
