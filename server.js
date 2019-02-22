@@ -204,6 +204,7 @@ app.get("/bathrooms/:id", function (req, res) {
 app.put("/bathrooms/:id", function (req, res) {
   var updateDoc = req.body;
   delete updateDoc._id;
+  updateSlackChannel(req.params.id, updateDoc.vacant);
   db.collection(BATHROOMS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to update bathroom");
@@ -211,7 +212,6 @@ app.put("/bathrooms/:id", function (req, res) {
       res.status(204).end();
     }
   });
-  updateSlackChannel(req.params.id, updateDoc.vacant);
 });
 
 function updateSlackChannel(id, state){
