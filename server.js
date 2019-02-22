@@ -137,17 +137,10 @@ app.post("/slash", function (req, res) {
 
     var url = request.response_url;
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.setRequestHeader("Content-Type", "application/json");
     xmlHttp.open("POST", url, true); // false for synchronous request
+    xmlHttp.setRequestHeader("Content-Type", "application/json");
     xmlHttp.send(body);
   })
-  // response =
-  //   {
-  //     "response_type": "ephemeral", // they call responses only visible to original users ephemeral
-  //     "text": "You have pinged bathroom bot",
-  //     "response_url": getResponseForBot
-  //   }
-  // res.status(200).json(response);
 });
 app.post("/slash-response", function (req, res) {
   var attachments = []
