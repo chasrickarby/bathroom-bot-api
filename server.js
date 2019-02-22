@@ -95,6 +95,13 @@ app.get("/bathrooms/:id", function (req, res) {
 });
 app.put("/bathrooms/:id", function (req, res) {
   var updateDoc = req.body;
+  for (var i = 0; i < BATHROOMS.length; i++) {
+    room = BATHROOMS[i];
+    if (Object.keys(room)[0] === req.params.id) {
+      updateDoc.name = Object.values(room)[0].name;
+      break;
+    }
+  }
   delete updateDoc._id;
   updateSlackChannel(req.params.id, updateDoc.vacant);
   db.collection(BATHROOMS_COLLECTION).updateOne({ _id: new ObjectID(req.params.id) }, updateDoc, function (err, doc) {
