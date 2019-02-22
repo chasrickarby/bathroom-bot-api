@@ -1,3 +1,5 @@
+require('dotenv').config();
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var express = require("express");
 var path = require("path");
 var bodyParser = require("body-parser");
@@ -31,7 +33,8 @@ mongodb.MongoClient.connect(process.env.MONGODB_URI, function (err, database) {
   });
 });
 
-// CONTACTS API ROUTES BELOW
+// BATHROOMS API ROUTES BELOW
+
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
   console.log("ERROR: " + reason);
@@ -44,6 +47,13 @@ function handleError(res, reason, message, code) {
  */
 
 app.get("/bathrooms", function(req, res) {
+  db.collection(BATHROOMS_COLLECTION).find({}).toArray(function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get bathrooms.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
 });
 
 app.post("/bathrooms", function(req, res) {
@@ -51,7 +61,7 @@ app.post("/bathrooms", function(req, res) {
   newBathroom.createDate = new Date();
 
   if (!(req.body.name)) {
-    handleError(res, "Invalid user input", "Must provide a name", 400);
+    handleError(res, "Invalid user input", "Must provide a name.", 400);
   }
 
   db.collection(BATHROOMS_COLLECTION).insertOne(newBathroom, function(err, doc) {
@@ -62,7 +72,6 @@ app.post("/bathrooms", function(req, res) {
     }
   });
 });
-});
 
 /*  "/bathrooms/:id"
  *    GET: find bathroom by id
@@ -70,11 +79,68 @@ app.post("/bathrooms", function(req, res) {
  *    DELETE: deletes bathroom by id
  */
 
+app.post("/slack", function(req, res) {
+  var request = req.body;
+  var challenge = request.challenge;
+  var text = request.event.text;
+  var type = request.event.type;
+  var channelName = request.event.channel;
+  var channelType = request.event.channel_type;
+  var apiAppId = request.api_app_id;
+  var message = "";
+  console.log(request);
+  if("app_mention" === type && text.toLowerCase().indexOf("status") !== -1) {
+    var promise1 = new Promise(function(resolve, reject){
+      db.collection(BATHROOMS_COLLECTION).find().toArray(function(err, result) {
+      result.forEach(function(bathroom){
+        if(bathroom.vacant){
+          message += ":awyeah: :partyparrot: " + bathroom.name + " is vacant! :partyparrot: :awyeah:\n";
+        }else{
+          message += ":awkwardseal: :nicmoji_sad: Uh oh, " + bathroom.name + " is occupied :nicmoji_sad: :awkwardseal:\n";
+        }
+      });
+      resolve(message);
+    })});
+    promise1.then(function(value) {
+      console.log(value);
+      var xmlHttp = new XMLHttpRequest();
+      theUrl = "https://slack.com/api/chat.postMessage?token=" + process.env.API_TOKEN + "&channel=" + channelName + "&text=" + message + "&pretty=1%20[1]%2013207";
+      xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+      xmlHttp.send( null );
+    })
+  }
+  res.status(200).send();
+});
+
 app.get("/bathrooms/:id", function(req, res) {
+  db.collection(BATHROOMS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to get bathroom");
+    } else {
+      res.status(200).json(doc);
+    }
+  });
 });
 
 app.put("/bathrooms/:id", function(req, res) {
+  var updateDoc = req.body;
+  delete updateDoc._id;
+
+  db.collection(BATHROOMS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to update bathroom");
+    } else {
+      res.status(204).end();
+    }
+  });
 });
 
 app.delete("/bathrooms/:id", function(req, res) {
+  db.collection(BATHROOMS_COLLECTION).deleteOne({_id: new ObjectID(req.params.id)}, function(err, result) {
+    if (err) {
+      handleError(res, err.message, "Failed to delete bathroom");
+    } else {
+      res.status(204).end();
+    }
+  });
 });
