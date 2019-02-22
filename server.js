@@ -141,7 +141,7 @@ app.post("/slash", function (req, res) {
     xmlHttp.setRequestHeader("Content-Type", "application/json");
     xmlHttp.send(body);
   });
-  res.status(200);
+  res.status(200).send();
 });
 app.post("/slash-response", function (req, res) {
   var attachments = []
