@@ -133,6 +133,7 @@ function updateSlackChannel(id, state) {
   fetch(postUrl)
     .then(response => response.json())
     .then(data => {
+      console.log(data)
       timestamp = data['message']['ts'];
       updatedRoom = {
         [id]: {
