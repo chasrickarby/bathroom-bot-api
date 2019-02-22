@@ -140,7 +140,8 @@ app.post("/slash", function (req, res) {
     xmlHttp.open("POST", url, true); // false for synchronous request
     xmlHttp.setRequestHeader("Content-Type", "application/json");
     xmlHttp.send(body);
-  })
+  });
+  res.status(200);
 });
 app.post("/slash-response", function (req, res) {
   var attachments = []
