@@ -115,13 +115,12 @@ function updateSlackChannel(id, state) {
       index = i;
       roomName = Object.values(room)[0].name;
       lastTimestamp = Object.values(room)[0].lastUpdated;
-      console.log(lastTimestamp);
       break;
     }
   }
   // Delete last message by timestamp
   if (lastTimestamp) {
-    url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=bathroom_bot&ts=' + lastTimestamp
+    url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GGEEVQ5H9&ts=' + lastTimestamp
     fetch(url, { method: 'POST' })
       .catch(error => console.error(error));
   }
@@ -133,7 +132,6 @@ function updateSlackChannel(id, state) {
   fetch(postUrl)
     .then(response => response.json())
     .then(data => {
-      console.log(data)
       timestamp = data['message']['ts'];
       updatedRoom = {
         [id]: {
