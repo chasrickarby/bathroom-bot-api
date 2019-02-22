@@ -202,6 +202,8 @@ app.post("/slack", function (req, res) {
 app.post("/slash", function (req, res) {
   var request = req.body;
   console.log(req);
+  console.log("****blah****");
+  console.log(res);
   var command = req.command;
   var text = request.text;
   // respond within 3000ms with status 200 that the request was received
