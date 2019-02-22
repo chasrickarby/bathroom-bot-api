@@ -236,11 +236,11 @@ app.post("/slash", function (req, res) {
       "attachments": attachments
     }
 
-    var url = request.response_url;
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", url, true); // false for synchronous request
-    xmlHttp.setRequestHeader("Content-Type", "application/json");
-    xmlHttp.send(body);
+    // var url = request.response_url;
+    // var xmlHttp = new XMLHttpRequest();
+    // xmlHttp.open("POST", url, true); // false for synchronous request
+    // xmlHttp.setRequestHeader("Content-Type", "application/json");
+    // xmlHttp.send(body);
     res.status(200).send(body);
   });
   
