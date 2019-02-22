@@ -115,20 +115,20 @@ function updateSlackChannel(id, state) {
       index = i;
       roomName = Object.values(room)[0].name;
       lastTimestamp = Object.values(room)[0].lastUpdated;
+      console.log(lastTimestamp);
       break;
     }
   }
-  console.log("room: " + room);
   // Delete last message by timestamp
   if (lastTimestamp) {
-    url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=#bathroom_bot&ts=' + lastTimestamp
+    url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=bathroom_bot&ts=' + lastTimestamp
     fetch(url, { method: 'POST' })
       .catch(error => console.error(error));
   }
 
   // Post new message
   stateText = state ? "vacant" : "occupied";
-  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=#bathroom_bot&text=The%20' + roomName + '%20bathroom%20is%20' + stateText
+  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=bathroom_bot&text=The%20' + roomName + '%20bathroom%20is%20' + stateText
 
   fetch(postUrl)
     .then(response => response.json())
