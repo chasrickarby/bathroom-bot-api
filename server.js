@@ -96,11 +96,10 @@ function updateSlackChannel(res, id, updateDoc) {
   });
   db_promise.then(result => {
     const timestamp = result.lastUpdated;
-    deleteSlackMessage(timestamp);
-    
+    deletePreviousSlackMessage(timestamp);
     // Post new message
     stateText = updateDoc.vacant ? "vacant" : "occupied";
-    postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&text=The%20' + roomName + '%20bathroom%20is%20' + stateText
+    postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&text=The%20' + BATHROOM_NAMES[id] + '%20bathroom%20is%20' + stateText
 
     fetch(postUrl)
       .then(response => response.json())
@@ -113,7 +112,7 @@ function updateSlackChannel(res, id, updateDoc) {
     });
 }
 
-function deleteSlackMessage(timestamp){
+function deletePreviousSlackMessage(timestamp){
   url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&ts=' + timestamp
 
   fetch(url, { method: 'POST' })
