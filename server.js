@@ -86,7 +86,7 @@ app.put("/bathrooms/:id", function (req, res) {
   console.log(1, updateDoc)
   updateDoc.name = BATHROOMS[req.params.id];
   console.log(2, updateDoc)
-  const timestamp = updateSlackChannel(req.params.id);
+  const timestamp = updateSlackChannel(req.params.id, updateDoc.vacant);
   console.log(3, updateDoc);
   updateDoc["lastUpdated"] =  timestamp;
   db.collection(BATHROOMS_COLLECTION).updateOne({ _id: new ObjectID(req.params.id) }, updateDoc, function (err, doc) {
@@ -98,7 +98,7 @@ app.put("/bathrooms/:id", function (req, res) {
   });
 });
 
-async function updateSlackChannel(id) {
+async function updateSlackChannel(id, state) {
   // Get pretty room info
   let roomName, lastTimestamp;
   for (var i = 0; i < BATHROOMS.length; i++) {
