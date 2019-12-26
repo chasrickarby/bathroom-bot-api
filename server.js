@@ -102,6 +102,16 @@ async function updateSlackChannel(res, id, updateDoc) {
   const roomName = BATHROOMS[id];
   const state = updateDoc.vacant;
 
+  var promise = new Promise(function (resolve, reject) {
+    db.collection(BATHROOMS_COLLECTION).findOne({ _id: new ObjectID(id) }, (function (err, result) {
+      console.log(1, result)
+      resolve(result);
+    }))
+  });
+  promise.then(result => {
+    console.log(2, result);
+  });
+
   // TODO Delete old message
   // if (lastTimestamp) {
   //   url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&ts=' + lastTimestamp
