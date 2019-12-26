@@ -84,7 +84,7 @@ app.get("/bathrooms/:id", function (req, res) {
 app.put("/bathrooms/:id", function (req, res) {
   var updateDoc = req.body;
   updateDoc.name = BATHROOMS[req.params.id];
-  updateSlackChannel(res, req.params.id, updateDocupdateDoc);
+  updateSlackChannel(res, req.params.id, updateDoc);
 });
 
 function updateDatabase(res, id, updateDoc){
