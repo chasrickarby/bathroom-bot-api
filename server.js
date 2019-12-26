@@ -101,7 +101,7 @@ function updateSlackChannel(res, id, updateDoc) {
 
   // Post new message
   stateText = updateDoc.vacant ? "vacant" : "occupied";
-  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&text=The%20' + BATHROOM_NAMES[id] + '%20bathroom%20is%20' + stateText
+  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=GGEEVQ5H9&text=The%20' + BATHROOM_NAMES[id] + '%20bathroom%20is%20' + stateText
 
   fetch(postUrl)
     .then(response => response.json())
@@ -114,7 +114,7 @@ function updateSlackChannel(res, id, updateDoc) {
 }
 
 function deletePreviousSlackMessage(timestamp){
-  url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&ts=' + timestamp
+  url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GGEEVQ5H9&ts=' + timestamp
 
   fetch(url, { method: 'POST' })
   .catch(error => console.error(error));
