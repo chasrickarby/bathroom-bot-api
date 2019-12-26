@@ -97,27 +97,22 @@ function updateDatabase(res, id, updateDoc){
   });
 }
 
-async function updateSlackChannel(res, id, updateDoc) {
+function updateSlackChannel(res, id, updateDoc) {
   // Get pretty room info
   const roomName = BATHROOMS[id];
   const state = updateDoc.vacant;
 
-  var promise = new Promise(function (resolve, reject) {
+  const db_promise = new Promise(function (resolve, reject) {
     db.collection(BATHROOMS_COLLECTION).findOne({ _id: new ObjectID(id) }, (function (err, result) {
-      console.log(1, result)
       resolve(result);
     }))
   });
-  promise.then(result => {
-    console.log(2, result);
+  db_promise.then(result => {
+    const timestamp = result.lastUpdated;
+    console.log(1, timestamp);
+    console.log(2, result["lastUpdated"]);
+    deleteSlackMessage(timestamp);
   });
-
-  // TODO Delete old message
-  // if (lastTimestamp) {
-  //   url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&ts=' + lastTimestamp
-  //   fetch(url, { method: 'POST' })
-  //     .catch(error => console.error(error));
-  // }
 
   // Post new message
   stateText = state ? "vacant" : "occupied";
@@ -131,6 +126,13 @@ async function updateSlackChannel(res, id, updateDoc) {
       updateDatabase(res, id, updateDoc);
     })
     .catch(error => console.error(error));
+}
+
+function deleteSlackMessage(timestamp){
+  url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&ts=' + timestamp
+
+  fetch(url, { method: 'POST' })
+  .catch(error => console.error(error));
 }
 
 app.delete("/bathrooms/:id", function (req, res) {
