@@ -7,24 +7,12 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 const fetch = require("node-fetch");
 
-var BATHROOMS_COLLECTION = "bathrooms";
+const BATHROOMS_COLLECTION = "bathrooms";
 
-var BATHROOMS = [
-  {
-    "5c5dcc98aa6c3e001790f844":
-    {
-      name: "LEFT",
-      lastUpdated: null,
-    }
-  },
-  {
-    "5c5dea87b3ab79e53642272f":
-    {
-      name: "RIGHT",
-      lastUpdated: null,
-    }
-  }
-]
+const BATHROOMS = {
+  "5c5dcc98aa6c3e001790f844": "LEFT",
+  "5c5dea87b3ab79e53642272f": "RIGHT"
+}
 
 var app = express();
 app.use(express.static(__dirname + "/public"));
@@ -95,15 +83,12 @@ app.get("/bathrooms/:id", function (req, res) {
 });
 app.put("/bathrooms/:id", function (req, res) {
   var updateDoc = req.body;
-  for (var i = 0; i < BATHROOMS.length; i++) {
-    room = BATHROOMS[i];
-    if (Object.keys(room)[0] === req.params.id) {
-      updateDoc.name = Object.values(room)[0].name;
-      break;
-    }
-  }
-  delete updateDoc._id;
-  updateSlackChannel(req.params.id, updateDoc.vacant);
+  console.log(1, updateDoc)
+  updateDoc.name = BATHROOMS[req.params.id];
+  console.log(2, updateDoc)
+  const timestamp = updateSlackChannel(req.params.id);
+  console.log(3, updateDoc);
+  updateDoc["lastUpdated"] =  timestamp;
   db.collection(BATHROOMS_COLLECTION).updateOne({ _id: new ObjectID(req.params.id) }, updateDoc, function (err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to update bathroom");
@@ -113,13 +98,12 @@ app.put("/bathrooms/:id", function (req, res) {
   });
 });
 
-function updateSlackChannel(id, state) {
+async function updateSlackChannel(id) {
   // Get pretty room info
-  let roomName, lastTimestamp, index;
+  let roomName, lastTimestamp;
   for (var i = 0; i < BATHROOMS.length; i++) {
     room = BATHROOMS[i];
     if (Object.keys(room)[0] === id) {
-      index = i;
       roomName = Object.values(room)[0].name;
       lastTimestamp = Object.values(room)[0].lastUpdated;
       break;
@@ -127,28 +111,23 @@ function updateSlackChannel(id, state) {
   }
   // Delete last message by timestamp
   if (lastTimestamp) {
-    url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GGEEVQ5H9&ts=' + lastTimestamp
+    url = 'https://slack.com/api/chat.delete?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&ts=' + lastTimestamp
     fetch(url, { method: 'POST' })
       .catch(error => console.error(error));
   }
 
   // Post new message
   stateText = state ? "vacant" : "occupied";
-  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=GGEEVQ5H9&text=The%20' + roomName + '%20bathroom%20is%20' + stateText
+  postUrl = 'https://slack.com/api/chat.postMessage?token=' + process.env.API_TOKEN + '&channel=GS52PUQT0&text=The%20' + roomName + '%20bathroom%20is%20' + stateText
 
-  fetch(postUrl)
+  let ts = await fetch(postUrl)
     .then(response => response.json())
     .then(data => {
       timestamp = data['message']['ts'];
-      updatedRoom = {
-        [id]: {
-          name: roomName,
-          lastUpdated: timestamp
-        }
-      }
-      BATHROOMS[index] = updatedRoom;
+      return timestamp
     })
-    .catch(error => console.error(error))
+    .catch(error => console.error(error));
+  return ts;
 }
 
 app.delete("/bathrooms/:id", function (req, res) {
